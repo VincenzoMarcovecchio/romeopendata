@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        #map {
+            height:
+                380px;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <h3>Il dataset contiene le biglietterie self service localizzate nel terrirorio della Città metropolitana di
+            Roma Capitale
+        </h3>
+        <div id="map"></div>
+
+    </section>
+    <section>
+        <h3>Quantità di rifiuti prodotti delle utenze domestiche, distinti per frazione merceologica, a livello
+            comunale- Raccolta
+            differenziata
+        </h3>
+        <canvas id="myChart"></canvas>
+
+    </section>
+</body>
+<script>
+    var map = L.map('map').setView([41.54, 12.29], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    fetch("meb.json")
+        .then((response) => response.json())
+        .then((responseData) => {
+            const stations = responseData.features;
+            const layerGroup = L.featureGroup().addTo(map);
+            stations.forEach(({ attributes }) => {
+                let LATITUDE = attributes.LATITUDE
+                let LONGITUDE = attributes.LONGITUDE
+                let NOME = attributes.NOME
+                let INDIRIZZO = attributes.INDIRIZZO
+                layerGroup.addLayer(
+                    L.marker([LATITUDE, LONGITUDE]).bindPopup(
+                        `Name: ${NOME}, Address: ${INDIRIZZO}`
+                    )
+                );
+            });
+
+            map.fitBounds(layerGroup.getBounds());
+        });
+</script>
+<script>
+    const ctx = document.getElementById('myChart');
+    var dataset = [
+        {
+            "Tipologia": "Carta  congiunta",
+            "Quantita": 39734
+        },
+        {
+            "Tipologia": "Cartone",
+            "Quantita": 14358
+        },
+        {
+            "Tipologia": "Carta utenze commerciali",
+            "Quantita": 941
+        },
+        {
+            "Tipologia": "Carta e cartone - non intercettato da AMA*",
+            "Quantita": 67976
+        },
+        {
+            "Tipologia": "Multimateriale",
+            "Quantita": 35787
+        },
+        {
+            "Tipologia": "Imballaggi di plastica (cassette ortofrutta) ANCI/CONIP",
+            "Quantita": 1106
+        },
+        {
+            "Tipologia": "Vetro monomateriale",
+            "Quantita": 35522
+        },
+        {
+            "Tipologia": "Verde",
+            "Quantita": 6479
+        },
+        {
+            "Tipologia": "Verde - non intercettato da AMA",
+            "Quantita": 34676
+        },
+        {
+            "Tipologia": "Mercatale e umido",
+            "Quantita": 93874
+        },
+        {
+            "Tipologia": "Ferro",
+            "Quantita": 1190
+        },
+        {
+            "Tipologia": "Legno",
+            "Quantita": 8869
+        },
+        {
+            "Tipologia": "ingombranti",
+            "Quantita": 13661
+        },
+        {
+            "Tipologia": "RAEE",
+            "Quantita": 4319
+        },
+        {
+            "Tipologia": "Rifiuti a recupero con riduzione tariffa**",
+            "Quantita": 10686
+        },
+        {
+            "Tipologia": "Inerti (presso Centri di raccolta AMA)",
+            "Quantita": 9091
+        },
+        {
+            "Tipologia": "Farmaci",
+            "Quantita": 90
+        },
+        {
+            "Tipologia": "Consumabili da stampa",
+            "Quantita": 52
+        },
+        {
+            "Tipologia": "Accumulatori esausti",
+            "Quantita": 140
+        },
+        {
+            "Tipologia": "Rifiuti pericolosi sul suolo pubblico avviati a recupero",
+            "Quantita": 163
+        },
+        {
+            "Tipologia": "Pile",
+            "Quantita": 48
+        },
+        {
+            "Tipologia": "Indumenti",
+            "Quantita": 3057
+        },
+        {
+            "Tipologia": "Contenitori vernici e solventi /vernici",
+            "Quantita": 246
+        },
+        {
+            "Tipologia": "Oli vegetali esausti",
+            "Quantita": 100
+        },
+        {
+            "Tipologia": "rimozione rifiuti abbondati sul suolo avviati a recupero",
+            "Quantita": 0
+        },
+        {
+            "Tipologia": "terre da spazzamento",
+            "Quantita": 9020
+        },
+        {
+            "Tipologia": "ingombranti da impianti",
+            "Quantita": 0
+        },
+        {
+            "Tipologia": "ALTRI*",
+            "Quantita": 1547
+        }
+    ]
+
+    var labels = dataset.map(function (e) {
+        return e.Tipologia;
+    });
+    var data = dataset.map(function (e) {
+        return e.Quantita;
+    });
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: 'Quantita',
+                data: data,
+            }]
+        }
+
+    });
+</script>
+
+</html>
