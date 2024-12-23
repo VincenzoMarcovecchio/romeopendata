@@ -16,6 +16,10 @@
             height:
                 380px;
         }
+        #map2 {
+            height:
+                380px;
+        }
     </style>
 </head>
 
@@ -34,6 +38,13 @@
         </h3>
         <canvas id="myChart"></canvas>
 
+    </section>
+    <section>
+        <h3>Il dataset contiene informazioni relative ai parcometri situati nelle zone del territorio della Città
+            metropolitana di
+            Roma Capitale soggette a sosta tariffata
+        </h3>
+        <div id="map2"></div>
     </section>
 </body>
 <script>
@@ -197,6 +208,34 @@
         }
 
     });
+</script>
+<script>
+    var map2 = L.map('map2').setView([41.54, 12.29], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map2);
+    fetch("parcometri.json")
+        .then((response) => response.json())
+        .then((responseData) => {
+            const stations = responseData.features;
+            console.log(stations)
+            const layerGroup2 = L.featureGroup().addTo(map2);
+            stations.forEach(({ attributes }) => {
+                let LATITUDE = attributes.LATITUDE
+                let LONGITUDE = attributes.LONGITUDE
+                let INDIRIZZO = attributes.INDIRIZZO
+                let PAGAMENTI = attributes.PAGAMENTI
+
+                layerGroup2.addLayer(
+                    L.marker([LATITUDE, LONGITUDE]).bindPopup(
+                        `Pagamenti:${PAGAMENTI}, Address:${INDIRIZZO}`
+                    )
+                );
+            });
+
+            map2.fitBounds(layerGroup2.getBounds());
+        });
 </script>
 
 </html>
